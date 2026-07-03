@@ -1,0 +1,27 @@
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# Android
+android/local.properties
+android/key.properties
+android/*.keystore
+android/*.jks
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Environment & secrets
+.env
+*.env
+secrets.dart
