@@ -543,7 +543,7 @@ class _journalWritingState extends State<journalWriting> {
                                   "lastWrittenDate": DateTime.now(),
                                 });
 
-                                FirebaseFirestore.instance.collection("users").doc(user?.uid).collection("journal_entries").add({
+                                await FirebaseFirestore.instance.collection("users").doc(user?.uid).collection("journal_entries").add({
                                   "content": journalController.text,
                                   "song": _selectedSongId,
                                   "mood": selectedIndex!,

@@ -6,54 +6,6 @@ import 'ProfileSettings.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// import 'package:http/http.dart' as http;
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
-//
-// class OpenAIService {
-//   final String apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
-//
-//   Future<String> sendMessage(String message) async {
-//     final response = await http.post(
-//       Uri.parse('https://api.openai.com/v1/chat/completions'),
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': 'Bearer $apiKey',
-//       },
-//       body: jsonEncode({
-//         "model": "gpt-4.1-mini",
-//         "messages": [
-//           {
-//             "role": "user",
-//             "content": message
-//           }
-//         ]
-//       }),
-//     );
-//
-//     if (response.statusCode == 200) {
-//       final data = jsonDecode(response.body);
-//
-//       return data['choices'][0]['message']['content'];
-//     } else {
-//       print(response.body);
-//       throw Exception('Failed to get response');
-//     }
-//   }
-// }
-//
-// final OpenAIService openAIService = OpenAIService();
-//
-// void askAI() async {
-//   try {
-//     String reply = await openAIService.sendMessage(
-//         "Hello!"
-//     );
-//
-//     print(reply);
-//   } catch (e) {
-//     print(e);
-//   }
-// }
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -63,14 +15,65 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // 1. Variables are now INSIDE the state class
   bool userWroteToday = false;
-  bool isLoading = true; // This prevents the user from clicking before we know the answer
+  bool isLoading = true;
+  late Future<List<Map<String, dynamic>>> journalsFuture;
+  int _weekOffset = 0;
+
+  Map<String, DateTime> _getWeekRange(int offset) {
+    DateTime now = DateTime.now();
+
+    int daysFromMonday = now.weekday - 1;
+    DateTime currentMonday = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysFromMonday));
+    DateTime targetMonday = currentMonday.add(Duration(days: offset * 7));
+    DateTime targetSunday = targetMonday.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+
+    return {
+      'start': targetMonday,
+      'end': targetSunday,
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveUserInfo() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return [];
+
+    final weekRange = _getWeekRange(_weekOffset);
+    DateTime startOfWeek = weekRange['start']!;
+    DateTime endOfWeek = weekRange['end']!;
+
+    QuerySnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection("journal_entries")
+        .where("timestamp", isGreaterThanOrEqualTo: Timestamp.fromDate(startOfWeek))
+        .where("timestamp", isLessThanOrEqualTo: Timestamp.fromDate(endOfWeek))
+        .orderBy("timestamp", descending: true)
+        .get();
+
+    List<Map<String, dynamic>> answer = [];
+
+    for (var doc in userDoc.docs) {
+      final Map<String, dynamic> data = doc.data();
+      if (data["timestamp"] == null) continue;
+
+      answer.add(data);
+    }
+
+    return answer.reversed.toList();
+  }
+
+  void _refreshJournals() {
+    setState(() {
+      journalsFuture = retrieveUserInfo();
+    });
+  }
 
   @override
+
   void initState() {
     super.initState();
-    // 2. Call the function when the screen loads
+    journalsFuture = retrieveUserInfo();
     _checkIfUserWroteToday();
   }
 
@@ -90,22 +93,17 @@ class _HomePageState extends State<HomePage> {
     "Sat",
     "Sun",
   ];
-  //
-  Future<QuerySnapshot<Map<String, dynamic>>> retrieveUserInfo() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    QuerySnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore.instance.collection('users').doc(user?.uid).collection("journal_entries").get();
 
-    return userDoc;
-  }
 
-  // 3. The function is now inside the class and handles errors safely
+
+
   Future<void> _checkIfUserWroteToday() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user == null) {
         setState(() { isLoading = false; });
-        return; // The code stops here!
+        return;
       }
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
@@ -200,13 +198,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(left: 105, top: 20),
-                        //   child: CircleAvatar(
-                        //     backgroundColor: Colors.brown,
-                        //     radius: 30,
-                        //   ),
-                        // ),
                       ],
                     ),
                     Padding(
@@ -233,24 +224,17 @@ class _HomePageState extends State<HomePage> {
                                 MaterialPageRoute(builder: (context) => const JournalAlreadyWritten()),
                               ).then((_) {
                                 _checkIfUserWroteToday();
+                                _refreshJournals();
                               });
                             }
                             else
                             {
-                              // User? user = FirebaseAuth.instance.currentUser;
-                              // FirebaseFirestore.instance.collection("users").doc(user?.uid).update({
-                              //   // "hasWrittenToday": true,
-                              //   // "lastWrittenDate": DateTime.now(),
-                              // });
-
-                              // setState(() {
-                              //   userWroteToday = true;
-                              // });
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const journalWriting()),
                               ).then((_) {
                                 _checkIfUserWroteToday();
+                                _refreshJournals();
                               });
                             }
                           },
@@ -424,13 +408,46 @@ class _HomePageState extends State<HomePage> {
                       );
                     }),
                     Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(
-                          "Weekly Emotional Trend",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          )
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                            onPressed: () {
+                              setState(() {
+                                _weekOffset--;
+                              });
+                              _refreshJournals();
+                            },
+                          ),
+
+                          Text(
+                            _weekOffset == 0
+                                ? "This Week's Trend"
+                                : _weekOffset == -1
+                                ? "Last Week's Trend"
+                                : "Week of ${_getWeekRange(_weekOffset)['start']!.month}/${_getWeekRange(_weekOffset)['start']!.day}",
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+
+                          IconButton(
+                            icon: Icon(
+                              Icons.arrow_forward_ios,
+                              color: _weekOffset >= 0 ? Colors.white38 : Colors.white,
+                            ),
+                            onPressed: _weekOffset >= 0 ? null : () {
+                              setState(() {
+                                _weekOffset++;
+                              });
+                              _refreshJournals();
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -465,7 +482,7 @@ class _HomePageState extends State<HomePage> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: FutureBuilder(
-                                future: retrieveUserInfo(),
+                                future: journalsFuture,
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(child: CircularProgressIndicator());
@@ -477,7 +494,7 @@ class _HomePageState extends State<HomePage> {
                                     return Text("Error: ${snapshot.error}");
                                   }
 
-                                  final data = snapshot.data?.docs;
+                                  final data = snapshot.data;
                                   if(data == null || data.isEmpty)
                                     {
                                       return Column(
@@ -485,7 +502,7 @@ class _HomePageState extends State<HomePage> {
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
-                                              "No journals found...",
+                                              "No journals this week...",
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 30,
@@ -512,22 +529,22 @@ class _HomePageState extends State<HomePage> {
                                       scrollDirection: Axis.horizontal,
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: data?.length,
+                                      itemCount: data.length,
                                       itemBuilder: (context, index)
                                       {
-                                        final fields = data?[index].data();
+                                        final fields = data[index];
 
-                                        DateTime Date = fields?["timestamp"].toDate();
+                                        DateTime Date = fields["timestamp"].toDate();
                                         return Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               Container(
-                                                height: fields?["intensity"] * 1.7,
+                                                height: fields["intensity"] * 1.7,
                                                 width: 30,
                                                 decoration: BoxDecoration(
-                                                  color: Moods[fields?["mood"]],
+                                                  color: Moods[fields["mood"]],
                                                   borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                                                 ),
                                               ),
