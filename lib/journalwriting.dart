@@ -199,97 +199,77 @@ class _journalWritingState extends State<journalWriting> {
               Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 20.0, bottom:20, right: 50, left: 20),
-                    child: const Text('How was your day today?',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      )
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: TextField(
-                      controller: journalController,
-                      maxLines: 15,
-                      decoration: InputDecoration(
-                        // contentPadding: EdgeInsets.symmetric(
-                        //   vertical: 100,
-                        //   horizontal: 1,
-                        // ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "Describe your day...",
+                    padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: const Text("Today's Journal",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          )
                       ),
-                      style: TextStyle(
-                        color: Colors.black,
-                      )
+                    ),
+                  ),Padding(
+                    padding: const EdgeInsets.only(left: 20.0, top: 20, bottom: 10),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: const Text("Choose your song:",
+                        style: TextStyle(
+                          fontSize: 20,
+                        )
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: const Text('Choose a song',
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        )),
-                  ),
+
                   Row(
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: TextField(
-                            onChanged: (value) {
-                              searchSong(value);
-                            },
-                            controller: songController,
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                              // contentPadding: EdgeInsets.symmetric(
-                              //   vertical: 100,
-                              //   horizontal: 1,
-                              // ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
-                              hintText: "Search a song...",
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Material(
+                            elevation: 8.0, // Control shadow depth here
+                            borderRadius: BorderRadius.circular(15.0),
+                            shadowColor: Colors.black, // Change shadow color
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: TextField(
+                                onChanged: (value) {
+                                  searchSong(value);
+                                },
+                                controller: songController,
+                                maxLines: 1,
+                                decoration: InputDecoration(
+                                  suffixIcon: Icon(
+                                    Icons.search,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  hintText: "Search a song...",
+                                ),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                )
+                              ),
                             ),
-                            style: TextStyle(
-                              color: Colors.black,
-                            )
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(9.0),
-                        child: Icon(
-                          Icons.search,
-                        ),
-                      )
-                      // IconButton(
-                      //   icon: Icon(Icons.search),
-                      //   onPressed: () {
-                      //     if(songController.text != "")
-                      //     {
-                      //       setState(() {
-                      //         // Overwrite the old future with the brand new network request
-                      //         _selectedSongId = null;
-                      //         _searchResultsFuture =searchSpotifyTrack(songController.text, token!);
-                      //       });
-                      //     }
-                      //     else
-                      //     {
-                      //       toastification.show(
-                      //         type: ToastificationType.error,
-                      //         context: context,
-                      //         title: Text("Please write a song name in the search box."),
-                      //         autoCloseDuration: const Duration(seconds: 5),
-                      //       );
-                      //     }
-                      //   },
-                      // ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(9.0),
+                      //   child: Icon(
+                      //     Icons.search,
+                      //   ),
+                      // )
                     ],
                   ),
                   FutureBuilder<List<dynamic>>(
@@ -299,9 +279,12 @@ class _journalWritingState extends State<journalWriting> {
                     // 2. The Builder: What to draw on the screen
                     builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
                       if(_searchResultsFuture == null)
-                        {
-                          return const Text("No songs found.");
-                        }
+                      {
+                        return Padding(
+                            padding: EdgeInsets.only(top: 10, bottom: 5),
+                            child: const Text("No songs found.", style: TextStyle(fontSize: 20))
+                        );
+                      }
                       // State 1: We are still waiting for Spotify to reply
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -318,81 +301,95 @@ class _journalWritingState extends State<journalWriting> {
 
                         return Padding(
                           padding: const EdgeInsets.all(20.0),
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                            ),
-                            // 1. WHAT IS CURRENTLY SELECTED?
-                            // We point it to our variable.
-                            initialValue: _selectedSongId,
-
-                            // 2. THE DEFAULT TEXT
-                            // What to show when _selectedSongId is null
-                            hint: const Text("Tap to choose a song"),
-
-                            // Prevents the dropdown text from overflowing the screen
-                            isExpanded: true,
-                            isDense: false,
-                            // 3. THE LIST OF OPTIONS
-                            // We map over the Spotify tracks and build a menu item for each one
-                            items: tracks.map<DropdownMenuItem<String>>((track) {
-                              String imageUrl = '';
-                              var images = track['album']['images'];
-                              if (images != null && images.isNotEmpty) {
-                                imageUrl = images.last['url']; // Grabs the thumbnail-sized image
-                              }
-
-                              return DropdownMenuItem<String>(
-                                value: track['id'],
-
-                                // 2. Swap the Text for a Row!
-                                child: Row(
-                                  children: [
-
-                                    // 3. The Album Art (or a fallback icon)
-                                    if (imageUrl.isNotEmpty)
-                                      Image.network(
-                                        imageUrl,
-                                        width: 40,   // Lock the size so the menu looks neat
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                      )
-                                    else
-                                      const SizedBox(
-                                        width: 40,
-                                        height: 40,
-                                        child: Icon(Icons.music_note),
-                                      ),
-
-                                    const SizedBox(width: 12), // Adds a nice gap between image and text
-
-                                    // 4. The Song Name
-                                    // We wrap the text in an 'Expanded' widget.
-                                    // If a song title is crazy long, this forces it to add "..."
-                                    // instead of crashing your screen!
-                                    Expanded(
-                                      child: Text(
-                                        '${track['name']} by ${track['artists'][0]['name']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  ],
+                          child: Material(
+                            elevation: 8.0, // Control shadow depth here
+                            borderRadius: BorderRadius.circular(15.0),
+                            shadowColor: Colors.black, // Change shadow color
+                            child: DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  borderSide: BorderSide.none,
                                 ),
-                              );
-                            }).toList(),
-                            // 4. WHEN THE USER CLICKS AN OPTION
-                            onChanged: (String? newlySelectedId) {
-                              final selectedTrack = tracks.firstWhere((track) => track['id'] == newlySelectedId);
-
-                              // 2. Use setState to update your variables
-                              setState(() {
-                                _selectedSongId = newlySelectedId;
-                                songName = selectedTrack['name']; // Save the name into your existing variable!
-                              });
-                              // Boom! You have successfully stored their choice!
-                              print("Awesome! You stored Song ID: $_selectedSongId");
-                            },
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              // 1. WHAT IS CURRENTLY SELECTED?
+                              // We point it to our variable.
+                              initialValue: _selectedSongId,
+                            
+                              // 2. THE DEFAULT TEXT
+                              // What to show when _selectedSongId is null
+                              hint: const Text("Tap to choose a song", style: TextStyle(color: Colors.black)),
+                            
+                              // Prevents the dropdown text from overflowing the screen
+                              isExpanded: true,
+                              isDense: false,
+                              // 3. THE LIST OF OPTIONS
+                              // We map over the Spotify tracks and build a menu item for each one
+                              items: tracks.map<DropdownMenuItem<String>>((track) {
+                                String imageUrl = '';
+                                var images = track['album']['images'];
+                                if (images != null && images.isNotEmpty) {
+                                  imageUrl = images.last['url']; // Grabs the thumbnail-sized image
+                                }
+                            
+                                return DropdownMenuItem<String>(
+                                  value: track['id'],
+                            
+                                  // 2. Swap the Text for a Row!
+                                  child: Row(
+                                    children: [
+                            
+                                      // 3. The Album Art (or a fallback icon)
+                                      if (imageUrl.isNotEmpty)
+                                        Image.network(
+                                          imageUrl,
+                                          width: 40,   // Lock the size so the menu looks neat
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                        )
+                                      else
+                                        const SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: Icon(Icons.music_note),
+                                        ),
+                            
+                                      const SizedBox(width: 12), // Adds a nice gap between image and text
+                            
+                                      // 4. The Song Name
+                                      // We wrap the text in an 'Expanded' widget.
+                                      // If a song title is crazy long, this forces it to add "..."
+                                      // instead of crashing your screen!
+                                      Expanded(
+                                        child: Text(
+                                          '${track['name']} by ${track['artists'][0]['name']}',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              // 4. WHEN THE USER CLICKS AN OPTION
+                              onChanged: (String? newlySelectedId) {
+                                final selectedTrack = tracks.firstWhere((track) => track['id'] == newlySelectedId);
+                            
+                                // 2. Use setState to update your variables
+                                setState(() {
+                                  _selectedSongId = newlySelectedId;
+                                  songName = selectedTrack['name']; // Save the name into your existing variable!
+                                });
+                                // Boom! You have successfully stored their choice!
+                                print("Awesome! You stored Song ID: $_selectedSongId");
+                              },
+                            ),
                           ),
                         );
                       }
@@ -413,117 +410,192 @@ class _journalWritingState extends State<journalWriting> {
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 5,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.music_note,
-                              size: 100,
-                            ),
-                          ),
-                          Text("Song #1"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 5,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.music_note,
-                              size: 100,
-                            ),
-                          ),
-                          Text("Song #2"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 5,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.music_note,
-                              size: 100,
-                            ),
-                          ),
-                          Text("Song #3"),
-                        ],
-                      ),
-                    ],
-                  ),
                   Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: const Text('Choose an emotion',
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        )),
-                  ),
-                  DropdownButton<int>(
-                    value: selectedIndex,
-                    hint: const Text("Select an emotion"),
-                    items: items.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final iconData = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
+                    padding: const EdgeInsets.only(left: 20.0, right: 20),
+                    child: Material(
+                      elevation: 8.0, // Control shadow depth here
+                      borderRadius: BorderRadius.circular(15.0),
+                      shadowColor: Colors.black, // Change shadow color
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Your background color here
+                          borderRadius: BorderRadius.circular(15.0), // Rounded corners
+                        ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Icon(iconData),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                dropDownValueList[index],
-                                style: TextStyle(
-                                  color: Colors.black,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 5,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.music_note,
+                                    size: 100,
+                                  ),
                                 ),
-                              ),
+                                Text("Song #1", style: TextStyle(color: Colors.black)),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 5,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.music_note,
+                                    size: 100,
+                                  ),
+                                ),
+                                Text("Song #2", style: TextStyle(color: Colors.black)),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 5,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.music_note,
+                                    size: 100,
+                                  ),
+                                ),
+                                Text("Song #3", style: TextStyle(color: Colors.black)),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (int? newIndex) {
-                      setState(() {
-                        selectedIndex = newIndex;
-                        if (newIndex != null) {
-                          dropDownValue = dropDownValueList[newIndex];
-                        }
-                      });
-                    },
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
+                      child: const Text('Journal Entry:', style: TextStyle(fontSize: 20)
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Material(
+                      elevation: 8.0, // Control shadow depth here
+                      borderRadius: BorderRadius.circular(15.0),
+                      shadowColor: Colors.black, // Change shadow color
+                      child: TextField(
+                        controller: journalController,
+                        maxLines: 10,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: "How was your day today, and how does your song connect to it?",
+                        ),
+                        style: TextStyle(
+                          color: Colors.black,
+                        )
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
+                      child: const Text('Choose an emotion:',
+                        style: TextStyle(
+                          fontSize: 20,
+                        )
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Material(
+                        elevation: 8.0, // Control shadow depth here
+                        borderRadius: BorderRadius.circular(15.0),
+                        shadowColor: Colors.black, // Change shadow color
+                        child: Container(
+                          width: 400,
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white, // Your background color here
+                            borderRadius: BorderRadius.circular(15.0), // Rounded corners
+                          ),
+                          child: DropdownButton<int>(
+                            isExpanded: true,
+                            value: selectedIndex,
+                            hint: const Text("Select an emotion", style: TextStyle(color: Colors.black)),
+                            items: items.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final iconData = entry.value;
+                              return DropdownMenuItem<int>(
+                                value: index,
+                                child: Row(
+                                  children: [
+                                    Icon(iconData),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        dropDownValueList[index],
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (int? newIndex) {
+                              setState(() {
+                                selectedIndex = newIndex;
+                                if (newIndex != null) {
+                                  dropDownValue = dropDownValueList[newIndex];
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.only(top:20),
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.center,
                       child: SizedBox(
                         height: 40,
-                        width: 500,
+                        width: 375,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,

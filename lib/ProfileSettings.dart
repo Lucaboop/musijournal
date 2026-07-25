@@ -168,7 +168,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                border: OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
                               ),
                             ),
                           ),
@@ -205,7 +210,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                border: OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
                               ),
                             ),
                           ),
@@ -242,7 +252,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                border: OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
                               ),
                             ),
                           ),
@@ -279,7 +294,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                 hintText: "* * * * * * * * *", // i cant access passwords, so ill do this
                                 filled: true,
                                 fillColor: Colors.white,
-                                border: OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
                               ),
                             ),
                           ),
@@ -392,7 +412,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                       padding: const EdgeInsets.only(top: 10, left: 25, right: 45),
                       child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                         ),
                         value: selectedGenre,
                         onChanged: (String? newValue) {
@@ -503,7 +528,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: const Size(180, 50),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                 side: BorderSide(width:1),
                                 backgroundColor: Colors.white,
@@ -534,7 +559,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: const Size(180, 50),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                   side: BorderSide(width:1),
                                   backgroundColor: Colors.white,

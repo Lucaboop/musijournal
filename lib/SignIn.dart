@@ -106,7 +106,7 @@ class _SignInState extends State<SignIn> {
                             hintText: "Email",
                             filled: true,
                             fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           style: TextStyle(
                             color: Colors.black,
@@ -135,7 +135,7 @@ class _SignInState extends State<SignIn> {
                             hintText: "Password",
                             filled: true,
                             fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           style: TextStyle(
                             color: Colors.black,

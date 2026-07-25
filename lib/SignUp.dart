@@ -107,7 +107,7 @@ class _SignUpState extends State<SignUp> {
                               hintText: "Email",
                               filled: true,
                               fillColor: Colors.white,
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             style: TextStyle(
                               color: Colors.black,
@@ -136,7 +136,7 @@ class _SignUpState extends State<SignUp> {
                               hintText: "Password, minimum 6 characters",
                               filled: true,
                               fillColor: Colors.white,
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             style: TextStyle(
                               color: Colors.black,
